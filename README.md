@@ -22,9 +22,11 @@ The 'modified.png' image was created with this tool with the command:
 python pitbeast.py -hide -o modified.png -n 2 -s "$(cat message.txt)" original.png
 ```
 
+![Image of flag](./modified.png)
+
 By using another pattern (-p) you can change the order of the channels that carry the hidden data.
 
-Note that the stego image can contain anything you want.
+Note that the stego image can contain text or anything you want, like a zip.
 
 ## Requirements
 

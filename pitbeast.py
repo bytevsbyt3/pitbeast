@@ -14,7 +14,7 @@ from PIL import Image
 def pixel_indicator_extract(channels, pattern, nbitlist, check=False, searches=[]):
     indicator = channels[pattern[0]]
     for nbit in nbitlist:
-        print('[+] picking %d bit per channel' % nbit)
+        print('[+] pick %d bit per channel' % nbit)
         bitstring = ""
         for i in range(len(indicator)):
             v = getbinext(indicator[i], 2)[-2:]
@@ -28,10 +28,31 @@ def pixel_indicator_extract(channels, pattern, nbitlist, check=False, searches=[
                 t = getbinext(channels[pattern[3]][i], nbit)
             elif v == 3: #11 no,no,no
                 pass
-            bitstring += f
-            bitstring += s
-            bitstring += t
-            bitstring += a
+            bitstring += f + s + t + a
+        check_string(bitstring, searches=searches)
+        write_bitstring_rawfile(bitstring, "temp_data.raw")
+        if check:
+            check_rawfile("temp_data.raw")
+    return None
+
+def pixel_indicator_extract_noalpha(channels, pattern, nbitlist, check=False, searches=[]):
+    indicator = channels[pattern[0]]
+    for nbit in nbitlist:
+        print('[+] pick %d bit per channel' % nbit)
+        bitstring = ""
+        for i in range(len(indicator)):
+            v = getbinext(indicator[i], 2)[-2:]
+            v = int(v, 2)
+            f=''; s=''; t=''
+            if v == 0:
+                f = getbinext(channels[pattern[1]][i], nbit)
+            elif v == 1:
+                s = getbinext(channels[pattern[2]][i], nbit)
+            elif v == 2:
+                pass
+            elif v == 3:
+                pass
+            bitstring += f + s + t
         check_string(bitstring, searches=searches)
         write_bitstring_rawfile(bitstring, "temp_data.raw")
         if check:
@@ -195,8 +216,11 @@ else:
     #channel_stat(channels['r'], 'red')
     #channel_stat(channels['g'], 'green')
     #channel_stat(channels['b'], 'blue')
+    words = [x for x in args.search.split(',') if x != '']
     if 'a' in channels:
         channel_stat(channels['a'], 'alpha')
-    words = [x for x in args.search.split(',') if x != '']
-    pixel_indicator_extract(channels, args.pattern, nbit, check=args.check, searches=words)
+        pixel_indicator_extract(channels, args.pattern, nbit, check=args.check, searches=words)
+    else:
+        args.pattern = args.pattern.replace('a','')
+        pixel_indicator_extract_noalpha(channels, args.pattern, nbit, check=args.check, searches=words)
     print('[+] Done! Last raw file is on the file system')
